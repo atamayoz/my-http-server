@@ -47,7 +47,7 @@ public final class MyHandler implements HttpHandler {
         }
 
         myRouter.execute(path, exchange);
-
+        /*
         var response = "Hello, this is your Java HTTP server!";
         exchange.getResponseHeaders().set("Content-Type", "text/plain");
 
@@ -55,6 +55,8 @@ public final class MyHandler implements HttpHandler {
         exchange.sendResponseHeaders(200, response.length());
         ous.write(response.getBytes(StandardCharsets.UTF_8));
         ous.close();
+
+         */
     }
 
     public MyHandler addRoute(String route, HttpHandler handlerFun) {
