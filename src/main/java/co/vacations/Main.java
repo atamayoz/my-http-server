@@ -1,6 +1,7 @@
 package co.vacations;
 
 import co.vacations.handler.MyHandler;
+import co.vacations.handler.MyProducerConsumerHandler;
 import co.vacations.handler.MyThreadPoolHandler;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -29,7 +30,7 @@ public class Main {
         MyHandler myHandler = (MyHandler) MyHandler.getInstance();
         myHandler.addRoute("/concurrency", handlerFunCurrency)
                 .addRoute("/concurrency/thread-pool", new MyThreadPoolHandler())
-                .addRoute("/concurrency/producer-consumer", handlerFun);
+                .addRoute("/concurrency/producer-consumer", new MyProducerConsumerHandler());
 
         myServer.createContext("/", myHandler);
         myServer.setExecutor(Executors.newVirtualThreadPerTaskExecutor());

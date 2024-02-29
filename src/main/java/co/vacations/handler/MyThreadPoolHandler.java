@@ -16,24 +16,11 @@ public class MyThreadPoolHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        System.out.println("*************** Handling new request ******************");
         File file = new File(FILE_PATH);
         try (ExecutorService executorService = Executors.newFixedThreadPool(3);
              BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
 
-            for (int i = 1; i <= 20; i++) {
-                final int taskId = i;
-                executorService.submit(() -> {
-                    String message = "This is the task id " + taskId + " running on thread " + Thread.currentThread().getName();
-                    try {
-                        writer.write(message);
-                        writer.newLine();
-                        writer.flush();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
+            writeToFile(executorService, writer);
 
             executorService.shutdown();
             if (!executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
@@ -55,9 +42,7 @@ public class MyThreadPoolHandler implements HttpHandler {
             exchange.getResponseHeaders().add("Content-Disposition", "attachment; filename=processed.txt");
             exchange.sendResponseHeaders(200, file.length());
 
-            var totalBytesRead = Files.copy(file.toPath(), ous);
-            System.out.println("*** Bytes read: " + totalBytesRead);
-
+            Files.copy(file.toPath(), ous);
             ous.close();
 
         } catch (InterruptedException | IOException e) {
@@ -65,7 +50,21 @@ public class MyThreadPoolHandler implements HttpHandler {
             System.err.println("****** " + e.getMessage());
             throw new RuntimeException(e);
         }
+    }
 
-
+    private static void writeToFile(ExecutorService executorService, BufferedWriter writer) {
+        for (int i = 1; i <= 20; i++) {
+            final int taskId = i;
+            executorService.submit(() -> {
+                String message = "This is the task id " + taskId + " running on thread " + Thread.currentThread().getName();
+                try {
+                    writer.write(message);
+                    writer.newLine();
+                    writer.flush();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
     }
 }
